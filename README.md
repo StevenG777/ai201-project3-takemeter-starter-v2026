@@ -42,6 +42,8 @@
 <!-- Your community, and what your classifier sorts posts into. Three or four
      sentences. -->
 
+TakeMeter sorts comments from r/LocalLLaMA, a public community about running open language models locally, by how much support they offer. It has four labels: `analysis` (every claim backed by a checkable fact), `hot_take` (a disputable claim with no support), `reaction` (only a feeling, thanks, praise, complaint, or wish), and `other` (a joke, pure question, bare status report, or a reply that only makes sense next to its parent). The model is a small language model fine-tuned on about 260 comments I labelled.
+
 
 
 ---
@@ -54,82 +56,124 @@
      The decision rule is worth a point on its own and it's the thing most
      people leave out. Every taxonomy has a hardest boundary. Name yours. -->
 
-### `label_one`
+### `analysis`
 
-**Definition:**
-
-**Example 1:**
->
-
-**Example 2:**
->
-
-### `label_two`
-
-**Definition:**
+**Definition:** Every claim the post makes is backed by a checkable fact in the post itself: a number, measurement, quote, link or source, or a named concrete example.
 
 **Example 1:**
+> Tested it with a small local test set I have.
 >
+> Laya got 76.9% while this got 92.3%, while being almost 2x faster in latency. The only area where it lost was ram usage(around 300MB more).
+>
+> Impressive
 
 **Example 2:**
->
+> Yep, I just checked my Pi logs using Qwen 3.8 Flash Next at Q4 and out of ~14k total tool calls, only 5 of them failed due to being malformed by the agent. Using recommended sampling params and default chat template on Gufo engine.
 
-### The hardest boundary
+### `hot_take`
 
-**Which two labels:**
+**Definition:** Makes at least one claim, prediction, or judgment someone could dispute with no checkable fact behind it, even if other parts of the post are supported or it also expresses a feeling.
 
-**The decision rule I used every time:**
-<!-- e.g. "If the post names a specific checkable fact, it's `analysis`, even
-     if the tone is heated." -->
+**Example 1:**
+> Gpt 5.6 Sol performance for a fraction of the cost. 🍜 Cooked
 
+**Example 2:**
+> Use pi it’s much much better than open code
 
+### `reaction`
+
+**Definition:** Expresses only a feeling, thanks, praise, complaint, or wish, with no disputable claim and no checkable fact.
+
+**Example 1:**
+> Nice models, shame about the license
+
+**Example 2:**
+> Impressive chart
+
+### `other` (stretch: a fourth label)
+
+I'm adding this fourth label as the stretch feature. My first pass over the community produced comments that fit none of the three, and deleting them would have hidden what the model will actually see.
+
+**Definition:** A joke, a pure question, a bare status report, or a reply that only makes sense next to its parent, with no claim, feeling, or fact.
+
+**Example 1:**
+> Whats the sampling
+
+**Example 2:**
+> Make firecrackers go BANG! louder 🔥 *Requires Manhattan Project to run 👀
+
+### The decision rules
+
+These exist because the boundaries are where labelling falls apart. I applied them in this order to every post: unsupported claim → `hot_take`; otherwise a checkable fact → `analysis`; otherwise a feeling → `reaction`; otherwise `other`.
+
+#### The hardest boundary
+
+**Which two labels:** `analysis` and `hot_take`
+
+**1. `analysis` vs `hot_take` — is every claim backed?**
+
+Any unsupported claim makes a post `hot_take`, even if it also contains numbers, a supported claim, or a feeling. A post is `analysis` only when every claim in it is backed by a checkable fact in the post. A named setup alone is not a checkable fact.
+
+> *"…qwen3.6-35b-a3b… decode speed of ~ 12 t/s… Lfm2.5 1.2b-instruct gets 40 t/s+ decode and matches frontier after fine-tuning…"* → `hot_take`. The speeds are real, but "matches frontier" has nothing behind it, and the numbers don't rescue it.
+
+> *"…out of ~14k total tool calls, only 5 of them failed due to being malformed by the agent."* → `analysis`. The count is the whole claim.
+
+**2. `hot_take` vs `reaction` — could someone reply "no, that's wrong"?**
+
+If yes, the post makes a claim, so it is a `hot_take`, even when it sounds excited. A post that is only a feeling, a wish, or thanks is a `reaction`.
+
+> *"Nvidia in shambles. Can't wait to see what the future brings."* → `hot_take`. It mixes a feeling with a claim about Nvidia.
+
+> *"Impressive chart"* → `reaction`. Only a feeling.
+
+**3. `reaction` vs `other` — is there a feeling?**
+
+A pure question, joke, or bare status report with no claim, feeling, or fact is `other`.
+
+> *"Whats the sampling"* → `other`. A pure question.
 
 ---
 
 ## The Dataset
 
-<!-- Where you collected from, how you labelled, your counts, and three hard
-     cases. -->
+**Where the posts came from:** Public comments from r/LocalLLaMA, taken from 19 threads I read in October 2026 (new and hot threads on model releases, benchmarks, hardware, and one on Linus Torvalds and AI-written code). I copied the comments by hand from the thread pages. I collected comments, not top-level posts, because most of the opinion and evidence in this community is in the replies. The largest thread (the Linux one) is about a fifth of the file, so thread-specific vocabulary could leak into what the model learns. Each row's `url` is the thread link, since I did not copy per-comment permalinks.
 
-**Where the posts came from:**
-
-**How I labelled them:** <!-- Cold first? Pre-labelled with AI and corrected?
-Say so plainly — the disclosure is required, not penalised. -->
+**How I labelled them:** I labelled 29 comments myself with no tools. The first 20 are marked `cold` in the note column. I labelled them under my earlier three-label definitions, before I settled the final rule below, and I left those labels as I first gave them so the agreement check stays honest. The other 9 hand-labelled rows say so in the note. The remaining 230 rows were pre-labelled by an AI tool (Claude) using my definitions, and each of those has a note starting "AI pre-label" and `unverified` set to `true`. I changed the rule partway through (any unsupported claim makes a post `hot_take`), and the AI rows were re-labelled to match. [Fill in after review: how many AI-labelled rows I read and corrected, and how many labels I changed.]
 
 **Counts per label:**
 
 | Label | Count | Share |
 |---|---|---|
-|  |  |  |
-|  |  |  |
-|  |  |  |
-| **Total** |  | 100% |
+| `hot_take` | 108 | 41.7% |
+| `reaction` | 60 | 23.2% |
+| `other` | 50 | 19.3% |
+| `analysis` | 41 | 15.8% |
+| **Total** | **259** | 100% |
+
+No label is above 70%. `analysis` is the thinnest label because few comments in this community back every claim with a number or source.
 
 **Three hard cases**
 
-<!-- Any post that made you pause: what it was, which two labels it could have
-     been, and what you chose. These are worth more than the easy 190. -->
-
 **1.**
-> *The post:*
+> *The post:* "Nvidia in shambles. Can't wait to see what the future brings."
 >
-> *Could have been:*
+> *Could have been:* `reaction` or `hot_take`
 >
-> *I chose, because:*
+> *I chose, because:* Cold, I labelled it `reaction` because it sounds like excitement. Under my final rule it is a `hot_take`, because "Nvidia in shambles" is a claim someone could dispute and nothing backs it up. I left the cold label in the file on purpose. It is one of the rows where my first labels and my final definitions disagree.
 
 **2.**
-> *The post:*
+> *The post:* "That's not actually true. With a multi-agent context managed system, qwen3.6-35b-a3b can get serious work done with a decode speed of ~ 12 t/s. Not to mention alternative models like fine-tuned lfm2.5 models. Lfm2.5 1.2b-instruct gets 40 t/s+ decode and matches frontier after fine-tuning on a specific tight domain. Those are just two examples. IQ2 models with a properly curated immatrix dataset can be pretty wild on cpu-only too. And of course custom franken-models."
 >
-> *Could have been:*
+> *Could have been:* `analysis` or `hot_take`
 >
-> *I chose, because:*
+> *I chose, because:* `hot_take`. It has real numbers (12 t/s, 40 t/s), but "matches frontier" is a claim with no support. My rule is that any unsupported claim makes a post a `hot_take`, so the numbers don't rescue it.
 
 **3.**
-> *The post:*
+> *The post:* "I've got the Q4 QAD quant on my Strix Halo, and strong disagree. It's quite good at the stuff I throw at it. You may need to change your quant, or update your inference software."
 >
-> *Could have been:*
+> *Could have been:* `analysis` or `hot_take`
 >
-> *I chose, because:*
+> *I chose, because:* `hot_take`. It names a specific setup, but no result or number, and "quite good" cannot be checked. A named setup alone is not a checkable fact.
 
 ---
 
