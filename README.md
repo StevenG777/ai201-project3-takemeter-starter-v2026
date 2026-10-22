@@ -138,7 +138,7 @@ A pure question, joke, or bare status report with no claim, feeling, or fact is 
 
 **Where the posts came from:** Public comments from r/LocalLLaMA, taken from 19 threads I read in October 2026 (new and hot threads on model releases, benchmarks, hardware, and one on Linus Torvalds and AI-written code). I copied the comments by hand from the thread pages. I collected comments, not top-level posts, because most of the opinion and evidence in this community is in the replies. The largest thread (the Linux one) is about a fifth of the file, so thread-specific vocabulary could leak into what the model learns. Each row's `url` is the thread link, since I did not copy per-comment permalinks.
 
-**How I labelled them:** I labelled 29 comments myself with no tools. The first 20 are marked `cold` in the note column. I labelled them under my earlier three-label definitions, before I settled the final rule below, and I left those labels as I first gave them so the agreement check stays honest. The other 9 hand-labelled rows say so in the note. The remaining 230 rows were pre-labelled by an AI tool (Claude) using my definitions, and each of those has a note starting "AI pre-label" and `unverified` set to `true`. I changed the rule partway through (any unsupported claim makes a post `hot_take`), and the AI rows were re-labelled to match. [Fill in after review: how many AI-labelled rows I read and corrected, and how many labels I changed.]
+**How I labelled them:** I labelled 29 comments myself with no tools. The first 20 are marked `cold` in the note column. I labelled them under my earlier three-label definitions, before I settled the final rule below, and I left those labels as I first gave them so the agreement check stays honest. The other 9 hand-labelled rows say so in the note. The remaining 230 rows were pre-labelled by an AI tool (Claude) using my definitions, and each of those has a note starting "AI pre-label" and `unverified` set to `true`. I changed the rule partway through (any unsupported claim makes a post `hot_take`), and the AI rows were re-labelled to match.
 
 **Counts per label:**
 
@@ -206,19 +206,21 @@ of next unit's variance. --> 70/15/15 stratified split of the 259 rows: 181 trai
      workflow and disclosing it costs you nothing. Not disclosing it is the
      problem. -->
 
-**Moment 1**
+**Moment 1: reviewing my criteria**
 
-- *What I asked for:*
-- *What came back:*
-- *What I changed:*
+- *What I asked for:* A check of my acceptance criteria. For criterion 1 I had written that overall accuracy should be better than 50%, and 15% higher than the baseline if the baseline scored 50%.
+- *What came back:* The criterion was two checks in one. The second half depended on a baseline score I didn't have yet. It didn't say which split or how many seeds it was measured on. "Impressive" and "convincing" in my reason were judgment words that wouldn't score the same way twice.
+- *What I changed:* I dropped the baseline from criterion 1, named the held-out test split and all three seeds, and rewrote the reason as the number of wrong labels out of 10 I'd accept for a feed filter.
 
-**Moment 2**
+**Moment 2: a question about chance and statistics**
 
-- *What I asked for:*
-- *What came back:*
-- *What I changed:*
+- *What I asked for:* How chance is calculated, and which assumptions of the binomial distribution would not hold for my data.
+- *What came back:* A table of how likely a random guesser is to reach a given number of correct posts out of n, using the binomial formula. It also explained that a trained model's errors are not independent and its chance of being right varies from post to post, so the table only describes a uniform random guesser. It corrected an earlier claim of its own, that label imbalance changes the 25% chance figure.
+- *What I changed:* I added to criterion 3 that fewer than 5 test posts for the smallest label is too coarse, because with 3 posts one post is a third of a label's recall.
 
-**Pre-labelling disclosure:**
+**How I worked with the AI:** I used Claude Code in this repo. I chose every target number myself, and the reasoning in criteria 1 to 5 comes from my own points. The AI did the reviewing and explaining described above, and it typed the criteria text into `criteria.md` from my numbers and wording. For criteria 3, 4 and 5 it also drafted parts of the "why this target" paragraphs from points I had made. It also rewrote the decision-rules section of this README in the staff-taxonomy style, kept my definitions and examples, and wrote the "What This Does" and "The Training Run" text. It could read the files in my repo, including the staff files.
+
+**Pre-labelling disclosure:** Claude pre-labelled 230 of the 259 rows from my definitions, and each has a note starting "AI pre-label" and `unverified` set to `true`. When I changed my decision rule partway through, the AI re-labelled those rows to match. I did not re-label them myself.
 
 <!-- ═══════════════════════ UNIT 6 — THE TEST ═══════════════════════
 
