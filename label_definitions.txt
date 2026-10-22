@@ -3,8 +3,10 @@
 # Copy these from your README so the baseline is judged on exactly the
 # definitions you wrote. baseline.py reads this file.
 #
-# Delete the examples below and put yours in.
+# Decision rule: any unsupported claim makes a post hot_take, even if it also contains a supported claim, numbers, or a feeling.
+# Check in this order: unsupported claim -> hot_take; otherwise a checkable fact -> analysis; otherwise a feeling -> reaction; otherwise other.
 
-analysis: makes an argument backed by a specific, checkable fact
-hot_take: a confident claim with no support offered
-reaction: an immediate response to something that just happened
+analysis: every claim it makes is backed by a checkable fact in the post, such as a number, measurement, quote, link or source, or a named concrete example
+hot_take: makes at least one claim, prediction, or judgment that someone could dispute and that has no checkable fact behind it, even if other parts of the post are supported or it also expresses a feeling
+reaction: expresses only a feeling, thanks, praise, complaint, or wish, with no disputable claim and no checkable fact
+other: a joke, a pure question, a bare status report, or a reply that only makes sense next to its parent, with no claim, feeling, or fact
