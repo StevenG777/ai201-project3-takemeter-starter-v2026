@@ -181,15 +181,17 @@ No label is above 70%. `analysis` is the thinnest label because few comments in 
 
 <!-- Your starting model, your settings, and anything you changed and why. -->
 
-**Base model:**
+**Base model:** `distilbert-base-uncased`
 
-**Settings:** <!-- epochs, learning rate, batch size, seed -->
+**Settings:** <!-- epochs, learning rate, batch size, seed --> 3 epochs, learning rate 2e-5, batch size 16, 128 tokens per post, seed 42.
 
-**Anything I changed from the defaults, and why:**
+**Device:** Apple Silicon GPU (`mps`), torch 2.14.1, as recorded in `results.json`. Different hardware can give slightly different numbers with the same seed.
+
+**Anything I changed from the defaults, and why:** Nothing. I ran the notebook with its default settings.
 
 **Split sizes:** <!-- train / val / test, and per-label counts in the test
 split. If a label had fewer than about 8 in test, say so — it explains a lot
-of next unit's variance. -->
+of next unit's variance. --> 70/15/15 stratified split of the 259 rows: 181 train / 39 validation / 39 test. Test posts per label: `hot_take` 16, `reaction` 9, `other` 8, `analysis` 6. `analysis` has fewer than about 8 in test, so its metrics will move a lot between seeds.
 
 
 
